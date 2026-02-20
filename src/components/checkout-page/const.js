@@ -1,10 +1,10 @@
 import moment from 'moment'
 import { t } from 'i18next'
 // let today = moment(currentDate).format('dddd')
-let currentDate = moment().format('yyyy-MM-DD HH:mm')
-let nextday = moment(currentDate).add(1, 'days').format('yyyy-MM-DD')
-let today = moment(currentDate).format('dddd')
-let currentTime = moment(currentDate).format('HH:mm')
+const currentDate = moment()
+const nextday = currentDate.clone().add(1, 'days')
+const today = currentDate.format('dddd')
+const currentTime = currentDate.format('HH:mm')
 
 export const getDayNumber = (day) => {
     switch (day) {

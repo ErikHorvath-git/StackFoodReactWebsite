@@ -91,15 +91,13 @@ import HaveCoupon from '@/components/checkout-page/HaveCoupon'
 import AddIcon from '@mui/icons-material/Add'
 import money from '@/components/checkout-page/assets/fi_2704332.png'
 
-let currentDate = moment().format('YYYY/MM/DD HH:mm')
-let nextday = moment(currentDate).add(1, 'days').format('YYYY/MM/DD')
+const currentDate = moment()
+const nextday = currentDate.clone().add(1, 'days')
 
-let today = moment(currentDate).format('dddd')
-let tomorrow = moment(nextday).format('dddd')
+const today = currentDate.format('dddd')
+const tomorrow = nextday.format('dddd')
 
-var CurrentDatee = moment().format()
-
-let todayTime = moment(CurrentDatee).format('HH:mm')
+const todayTime = currentDate.format('HH:mm')
 
 export const handleValuesFromCartItems = (variationValues) => {
     let value = []

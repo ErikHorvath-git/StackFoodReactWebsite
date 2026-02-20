@@ -45,8 +45,7 @@ const ForgotPassword = ({ setModalFor }) => {
     }
     const setUpRecaptcha = () => {
         if (!auth) {
-            console.error('Firebase Auth not initialized');
-            return;
+            return false
         }
 
         if (document.getElementById('recaptcha-container')) {
@@ -73,14 +72,17 @@ const ForgotPassword = ({ setModalFor }) => {
                 window.recaptchaVerifier = null
             }
         }
+        return true
     }
 
     const sendOTP = (phone) => {
-        setUpRecaptcha()
+        const isRecaptchaReady = setUpRecaptcha()
+        if (!isRecaptchaReady) return
 
         const phoneNumber = phone
         // country code
         const appVerifier = window.recaptchaVerifier
+        if (!auth || !appVerifier) return
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
             .then((confirmationResult) => {
                 setVerificationId(confirmationResult.verificationId)

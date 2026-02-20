@@ -31,8 +31,7 @@ const SignUpPage = dynamic(() => import('./sign-up'))
 
 export const setUpRecaptcha = () => {
     if (!auth) {
-        console.error('Firebase Auth not initialized');
-        return;
+        return false
     }
 
     if (document.getElementById('recaptcha-container')) {
@@ -59,6 +58,7 @@ export const setUpRecaptcha = () => {
             window.recaptchaVerifier = null
         }
     }
+    return true
 }
 const AuthModal = ({
     open,
@@ -195,6 +195,9 @@ const AuthModal = ({
         }
         // country code
         const appVerifier = window.recaptchaVerifier
+        if (!auth || !appVerifier) {
+            return
+        }
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
             .then((confirmationResult) => {
                 setVerificationId(confirmationResult.verificationId)

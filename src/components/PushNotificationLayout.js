@@ -55,7 +55,11 @@ const PushNotificationLayout = ({ children, refetch, pathName }) => {
             .then((payload) => {
                 setNotification(payload.data)
             })
-            .catch((err) => toast(err))
+            .catch((err) => {
+                const message =
+                    err instanceof Error ? err.message : 'Notification error'
+                toast.error(message)
+            })
         if (notification) {
             if (pathName === 'info' && notification.type === 'message') {
                 refetch()
