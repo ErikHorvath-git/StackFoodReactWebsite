@@ -1,5 +1,5 @@
 import Meta from '../../components/Meta'
-import ProtectShipping from './ProtectShipping'
+import ProtectShipping from '@/components/policy-protectors/ProtectShipping'
 import { Container, CssBaseline, NoSsr } from '@mui/material'
 import ShippingPolicyPage from '../../components/shipping-policy/ShippingPolicyPage'
 import { getCommonServerSideProps } from '@/helpers/serverSidePropsHelper'

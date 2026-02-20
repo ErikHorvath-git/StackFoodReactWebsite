@@ -1,3 +1,29 @@
+# StackFood Next.js Frontend
+
+## Deploy to Railway
+
+1. Push this repository to GitHub/GitLab.
+2. In Railway create a new project and select this repo.
+3. Railway will auto-detect `railway.json` and run:
+   - build: `npm run build`
+   - start: `npm run start`
+4. In Railway service variables, set all values from `.env.example`.
+5. Make sure:
+   - `NEXT_PUBLIC_BASE_URL` points to your backend API URL.
+   - `NEXT_CLIENT_HOST_URL` is your Railway app URL.
+   - Firebase vars are filled if OTP/push notification features are used.
+6. Redeploy service.
+
+Local production check:
+
+```bash
+npm install
+npm run build
+npm run start
+```
+
+---
+
 # Getting Started with Create React App
 
 

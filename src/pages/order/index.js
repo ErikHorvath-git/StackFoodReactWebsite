@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { Box, Card, Container, Stack, NoSsr } from '@mui/material'
-import SuccessCard from '../../components/checkout-page/SuccessCard'
+import { Container, Stack, NoSsr } from '@mui/material'
 import { useRouter } from 'next/router'
-import CheckoutFailed from '../../components/checkout-page/CheckoutFailed'
+import dynamic from 'next/dynamic'
 import { CustomPaperBigCard } from '../../styled-components/CustomStyles.style'
 import Meta from '../../components/Meta'
-import jwt_decode from 'jwt-decode'
-import { useTranslation } from 'react-i18next'
 import jwt from 'base-64'
 import { t } from 'i18next'
+
+const SuccessCard = dynamic(() => import('../../components/checkout-page/SuccessCard'), {
+    ssr: false,
+})
+
+const CheckoutFailed = dynamic(() => import('../../components/checkout-page/CheckoutFailed'), {
+    ssr: false,
+})
 const Index = (props) => {
     const router = useRouter()
     const { flag, amnt, token, orderId } = router.query

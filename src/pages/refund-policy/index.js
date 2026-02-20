@@ -1,5 +1,5 @@
 import Meta from '../../components/Meta'
-import ProtectRefund from './ProtectRefund'
+import ProtectRefund from '@/components/policy-protectors/ProtectRefund'
 import { Container, CssBaseline, NoSsr } from '@mui/material'
 import RefundPolicyPage from '../../components/refund-policy/RefundPolicyPage'
 import { getCommonServerSideProps } from '@/helpers/serverSidePropsHelper'

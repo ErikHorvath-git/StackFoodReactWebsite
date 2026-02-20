@@ -1,6 +1,6 @@
 import Meta from '../../components/Meta'
 import React from 'react'
-import ProtectCancellation from './ProtectCancellation'
+import ProtectCancellation from '@/components/policy-protectors/ProtectCancellation'
 import { Container, CssBaseline, NoSsr } from '@mui/material'
 import CancellationPolicyPage from '../../components/cancellation-policy/CancellationPolicyPage'
 import { getCommonServerSideProps } from '@/helpers/serverSidePropsHelper'
