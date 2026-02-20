@@ -1,5 +1,7 @@
 import axios from 'axios'
-export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+const FALLBACK_API_BASE_URL = 'https://athletic-victory-production-b8f6.up.railway.app'
+const configuredBaseUrl = process.env.NEXT_PUBLIC_BASE_URL?.trim()
+export const baseUrl = (configuredBaseUrl || FALLBACK_API_BASE_URL).replace(/\/+$/, '')
 
 const MainApi = axios.create({
     baseURL: baseUrl,
