@@ -53,7 +53,8 @@ export default RestaurantDetailsPage
 export async function getStaticPaths() {
     try {
         const popularRestaurants = await MainApi.get('/api/v1/restaurants/popular')
-        const paths = popularRestaurants.data.slice(0, 10).map(restaurant => ({
+        const restaurants = popularRestaurants?.data ?? []
+        const paths = restaurants.slice(0, 10).map(restaurant => ({
             params: { slug: restaurant.slug, id: restaurant.id.toString() }
         }))
 
@@ -93,7 +94,7 @@ export async function getStaticProps(context) {
 
         return {
             props: {
-                restaurantData: data.data,
+                restaurantData: data?.data ?? null,
                 configData: config,
             },
             // Using a longer revalidation time since we'll use on-demand revalidation
@@ -106,4 +107,3 @@ export async function getStaticProps(context) {
         }
     }
 }
-

@@ -43,7 +43,7 @@ export const getCommonServerSideProps = async (context, pageName, pageId = null)
     return {
         props: {
             configData: config,
-            landingPageData: landingPageData.data,
+            landingPageData: landingPageData?.data ?? null,
             pathName: pathName,
             metaData: metaData,
         },

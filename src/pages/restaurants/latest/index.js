@@ -48,7 +48,7 @@ export const getServerSideProps = async ({ params, req, resolvedUrl }) => {
     return {
         props: {
             configData: config,
-            landingPageData: landingPageData.data,
+            landingPageData: landingPageData?.data ?? null,
             pathName: pathName,
         },
     }
