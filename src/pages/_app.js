@@ -68,6 +68,18 @@ const App = ({ Component, pageProps, emotionCache = clientSideEmotionCache }) =>
     setViewFooter(true)
   }, [router])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY || ''
+    const preview = key ? `${key.slice(0, 6)}...` : 'EMPTY'
+    // Temporary deploy debug for Google Maps key injection.
+    console.info('[maps-env-debug]', {
+      hasKey: Boolean(key),
+      keyLength: key.length,
+      keyPreview: preview,
+    })
+  }, [])
+
   return (
     <CacheProvider value={emotionCache}>
       <QueryClientProvider client={queryClient}>
