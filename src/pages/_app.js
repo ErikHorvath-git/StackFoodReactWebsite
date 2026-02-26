@@ -73,7 +73,7 @@ const App = ({ Component, pageProps, emotionCache = clientSideEmotionCache }) =>
     const key = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY || ''
     const preview = key ? `${key.slice(0, 6)}...` : 'EMPTY'
     // Temporary deploy debug for Google Maps key injection.
-    console.info('[maps-env-debug]', {
+    console.warn('[maps-env-debug]', {
       hasKey: Boolean(key),
       keyLength: key.length,
       keyPreview: preview,
