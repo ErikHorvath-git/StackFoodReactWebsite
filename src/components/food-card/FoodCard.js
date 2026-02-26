@@ -87,7 +87,9 @@ const FoodCard = ({
                 }
             },
             onError: (error) => {
-                toast.error(error.response.data.message)
+                toast.error(
+                    error?.response?.data?.message || t('Something went wrong')
+                )
             },
         }
     )
@@ -111,7 +113,9 @@ const FoodCard = ({
         mutate(id, {
             onSuccess: onSuccessHandlerForDelete,
             onError: (error) => {
-                toast.error(error.response.data.message)
+                toast.error(
+                    error?.response?.data?.message || t('Something went wrong')
+                )
             },
         })
     }

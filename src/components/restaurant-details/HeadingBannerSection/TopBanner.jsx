@@ -105,7 +105,7 @@ const TopBanner = ({ details }) => {
                                         }}
                                     >
                                         <Slider {...settings}>
-                                            {data.data.map((coupon) => (
+                                            {data?.data?.map((coupon) => (
                                                 <Stack key={coupon?.id}>
                                                     <RestaurantCoupon coupon={coupon} />
                                                 </Stack>

@@ -933,7 +933,10 @@ const FoodDetailModal = ({
                 }
             },
             onError: (error) => {
-                CustomToaster('error', error.response.data.message)
+                CustomToaster(
+                    'error',
+                    error?.response?.data?.message || t('Something went wrong')
+                )
             },
         }
     )
@@ -953,7 +956,10 @@ const FoodDetailModal = ({
         mutate(id, {
             onSuccess: onSuccessHandlerForDelete,
             onError: (error) => {
-                CustomToaster('error', error.response.data.message)
+                CustomToaster(
+                    'error',
+                    error?.response?.data?.message || t('Something went wrong')
+                )
             },
         })
     }
