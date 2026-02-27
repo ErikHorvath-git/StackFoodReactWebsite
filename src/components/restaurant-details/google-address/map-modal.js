@@ -31,8 +31,8 @@ const MapModal = ({ open, handleClose, latitude, longitude, address }) => {
     const { data: places, error } = useQuery(
         ['places', searchKey],
         async () => GoogleApi.placeApiAutocomplete(searchKey),
-        { enabled },
         {
+            enabled,
             retry: 1,
         }
     )
@@ -43,8 +43,8 @@ const MapModal = ({ open, handleClose, latitude, longitude, address }) => {
     const { data: placeDetails } = useQuery(
         ['placeDetails', placeId],
         async () => GoogleApi.placeApiDetails(placeId),
-        { enabled: false },
         {
+            enabled: false,
             retry: 1,
         }
     )
@@ -52,9 +52,9 @@ const MapModal = ({ open, handleClose, latitude, longitude, address }) => {
     const { data: zoneData } = useQuery(
         ['zoneId', location],
         async () => GoogleApi.getZoneId(location),
-        { enabled: locationEnabled },
         {
-            retry: 1,
+            enabled: locationEnabled,
+            retry: false,
         }
     )
 

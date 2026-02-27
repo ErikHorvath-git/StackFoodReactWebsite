@@ -119,8 +119,8 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
     } = useQuery(
         ['places', searchKey],
         async () => GoogleApi.placeApiAutocomplete(searchKey),
-        { enabled },
         {
+            enabled,
             retry: 1,
         }
     )
@@ -137,24 +137,21 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
             enabled: placeDetailsEnabled,
             onSuccess: () => setLoadingAuto(false),
             onError: onSingleErrorResponse,
-        },
-        {
             retry: 1,
-        }
+        },
     )
 
     const {
         isLoading: locationLoading,
         data: zoneData,
-        isError: isErrorLocation,
         error: errorLocation,
-        refetch: locationRefetch,
     } = useQuery(
         ['zoneId', location],
         async () => GoogleApi.getZoneId(location),
-        { enabled: locationEnabled, onError: onErrorResponse },
         {
-            retry: 1,
+            enabled: locationEnabled,
+            onError: onErrorResponse,
+            retry: false,
         }
     )
     const { coords, isGeolocationEnabled } = useGeolocated({
@@ -174,8 +171,6 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         }
     }, [])
 
-    if (isErrorLocation) {
-    }
     const { data: geoCodeResults, refetch: refetchCurrentLocation } = useQuery(
         ['geocode-api', location],
         async () => GoogleApi.geoCodeApi(location)
@@ -193,14 +188,12 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         }
     }, [geoCodeResults])
     useEffect(() => {
-        if (zoneData) {
-            setZoneId(zoneData?.data?.zone_id)
-            dispatch(setZoneData(zoneData?.data?.zone_data))
+        const zonePayload = zoneData?.data
+        if (zonePayload?.zone_id) {
+            setZoneId(zonePayload?.zone_id)
+            dispatch(setZoneData(zonePayload?.zone_data || []))
             setLocationEnabled(false)
         } else {
-            locationRefetch()
-        }
-        if (!zoneData) {
             setZoneId(undefined)
         }
     }, [zoneData])
@@ -445,7 +438,7 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
                             handleClose()
                         }}
                     >
-                        {errorLocation?.response?.data?.errors[0]?.message}
+                        {errorLocation?.response?.data?.errors?.[0]?.message}
                     </Button>
                 ) : (
                     <>

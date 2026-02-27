@@ -38,9 +38,16 @@ export const onErrorResponse = (error) => {
         handle429Error(error)
         return
     }
-    error?.response?.data?.errors?.forEach((item) => {
-        CustomToaster('error', item?.message)
-    })
+    const errors = error?.response?.data?.errors
+    if (Array.isArray(errors) && errors.length > 0) {
+        errors.forEach((item) => {
+            CustomToaster('error', item?.message)
+        })
+    } else if (error?.response?.data?.message) {
+        CustomToaster('error', error.response.data.message)
+    } else if (error?.message) {
+        CustomToaster('error', error.message)
+    }
     handleTokenExpire(error?.response?.status)
 }
 export const onSingleErrorResponse = (error) => {
@@ -48,6 +55,12 @@ export const onSingleErrorResponse = (error) => {
         handle429Error(error)
         return
     }
-    CustomToaster('error', error?.response?.data?.message)
+    const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.errors?.[0]?.message ||
+        error?.message
+    if (message) {
+        CustomToaster('error', message)
+    }
     handleTokenExpire(error?.response?.status)
 }
