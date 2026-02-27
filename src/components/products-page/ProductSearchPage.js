@@ -253,7 +253,7 @@ const ProductSearchPage = ({
                           total_size: filteredData?.length,
                       }
                     : {
-                          ...pageData.data,
+                          ...pageData?.data,
                           restaurants: filteredData,
                           total_size: filteredData?.length,
                       },

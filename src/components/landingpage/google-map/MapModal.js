@@ -34,6 +34,18 @@ import { CustomTypographyGray } from '../../error/Errors.style'
 import { CustomToaster } from '@/components/custom-toaster/CustomToaster'
 
 const getPayload = (value) => value?.data ?? value ?? null
+const getCachedLatLng = () => {
+    if (typeof window === 'undefined') return null
+    try {
+        const cached = JSON.parse(localStorage.getItem('currentLatLng'))
+        const lat = Number(cached?.lat)
+        const lng = Number(cached?.lng)
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null
+        return { lat, lng }
+    } catch {
+        return null
+    }
+}
 
 const CustomBoxWrapper = styled(Box)(({ theme }) => ({
     outline: 'none',
@@ -102,7 +114,7 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
     const [locationEnabled, setLocationEnabled] = useState(false)
     const [placeId, setPlaceId] = useState('')
     const [placeDescription, setPlaceDescription] = useState(undefined)
-    const [location, setLocation] = useState(global?.default_location)
+    const [location, setLocation] = useState(global?.default_location || null)
     const [zoneId, setZoneId] = useState(undefined)
     const [isLoadingCurrentLocation, setLoadingCurrentLocation] =
         useState(false)
@@ -165,6 +177,19 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         userDecisionTimeout: 1000,
         isGeolocationEnabled: true,
     })
+
+    useEffect(() => {
+        const cachedLocation = getCachedLatLng()
+        if (cachedLocation) {
+            setLocation(cachedLocation)
+            setLocationEnabled(true)
+            return
+        }
+        if (global?.default_location) {
+            setLocation(global.default_location)
+            setLocationEnabled(true)
+        }
+    }, [global?.default_location])
 
     useEffect(() => {
         if (coords) {

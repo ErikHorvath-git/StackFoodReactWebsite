@@ -10,6 +10,18 @@ import {
 import { onErrorResponse } from '@/components/ErrorResponse'
 
 const getPayload = (value) => value?.data ?? value ?? null
+const getCachedLatLng = () => {
+    if (typeof window === 'undefined') return null
+    try {
+        const cached = JSON.parse(localStorage.getItem('currentLatLng'))
+        const lat = Number(cached?.lat)
+        const lng = Number(cached?.lng)
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null
+        return { lat, lng }
+    } catch {
+        return null
+    }
+}
 
 export const useGetLocation = (coords) => {
     const dispatch = useDispatch()
@@ -39,11 +51,17 @@ export const useGetLocation = (coords) => {
     )
 
     useEffect(() => {
+        const cachedLocation = getCachedLatLng()
+        if (cachedLocation) {
+            dispatch(setLocation(cachedLocation))
+            setLocationEnabled(true)
+            return
+        }
         if (global?.default_location) {
             dispatch(setLocation(global?.default_location))
             setLocationEnabled(true)
         }
-    }, [global?.default_location])
+    }, [dispatch, global?.default_location])
 
     const { data: zoneData } = useQuery(
         ['zoneId', location],
