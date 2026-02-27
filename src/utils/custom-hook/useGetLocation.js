@@ -9,6 +9,8 @@ import {
 } from '@/redux/slices/addressData'
 import { onErrorResponse } from '@/components/ErrorResponse'
 
+const getPayload = (value) => value?.data ?? value ?? null
+
 export const useGetLocation = (coords) => {
     const dispatch = useDispatch()
     const { global } = useSelector((state) => state.globalSettings)
@@ -27,8 +29,6 @@ export const useGetLocation = (coords) => {
     const [currentLocationValue, setCurrentLactionValue] = useState({
         description: '',
     })
-    console.log({ location });
-
     const { data: places, isLoading: isLoadingPlacesApi } = useQuery(
         ['places', searchKey.description],
         async () => GoogleApi.placeApiAutocomplete(searchKey.description),
@@ -77,28 +77,29 @@ export const useGetLocation = (coords) => {
         }
     }, [placeDetails])
     useEffect(() => {
-
-
-        if (places) {
-            const tempData = places?.data?.suggestions?.map((item) => ({
+        const placesPayload = getPayload(places)
+        if (placesPayload) {
+            const tempData = (placesPayload?.suggestions || []).map((item) => ({
                 place_id: item.placePrediction.placeId,
                 description: `${item?.placePrediction?.structuredFormat?.mainText?.text}, ${item?.placePrediction?.structuredFormat?.secondaryText?.text || ""}`
             }))
             setPredictions(tempData)
+        } else {
+            setPredictions([])
         }
     }, [places])
 
 
     useEffect(() => {
-        if (zoneData) {
-            setZoneId(zoneData?.data?.zone_id)
-            dispatch(setZoneIds(zoneData?.data?.zone_id))
+        const zonePayload = getPayload(zoneData)
+        if (zonePayload?.zone_id) {
+            setZoneId(zonePayload.zone_id)
+            dispatch(setZoneIds(zonePayload.zone_id))
             setLocationEnabled(false)
             setMounted(false)
-        }
-        if (!zoneData) {
+        } else {
             setZoneId(undefined)
-            dispatch(setZoneIds(zoneData?.data?.zone_id))
+            dispatch(setZoneIds(null))
         }
     }, [zoneData])
 
@@ -112,19 +113,20 @@ export const useGetLocation = (coords) => {
         dispatch(setLocation(value))
     }
     useEffect(() => {
-        if (geoCodeResults) {
+        const geoPayload = getPayload(geoCodeResults)
+        const formattedAddress = geoPayload?.results?.[0]?.formatted_address
+        if (formattedAddress) {
             dispatch(
-                setFormattedAddress(
-                    geoCodeResults?.data?.results[0]?.formatted_address
-                )
+                setFormattedAddress(formattedAddress)
             )
         }
     }, [geoCodeResults])
     useEffect(() => {
-        if (geoCodeResults) {
+        const geoPayload = getPayload(geoCodeResults)
+        const formattedAddress = geoPayload?.results?.[0]?.formatted_address
+        if (formattedAddress) {
             setCurrentLactionValue({
-                description:
-                    geoCodeResults?.data?.results[0]?.formatted_address,
+                description: formattedAddress,
             })
         } else {
             setCurrentLactionValue({

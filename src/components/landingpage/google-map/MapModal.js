@@ -33,6 +33,8 @@ import { CustomStackFullWidth } from '@/styled-components/CustomStyles.style'
 import { CustomTypographyGray } from '../../error/Errors.style'
 import { CustomToaster } from '@/components/custom-toaster/CustomToaster'
 
+const getPayload = (value) => value?.data ?? value ?? null
+
 const CustomBoxWrapper = styled(Box)(({ theme }) => ({
     outline: 'none',
     position: 'absolute',
@@ -124,10 +126,12 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
             retry: 1,
         }
     )
-    if (error) {
-        setPredictions([])
-        setEnabled(false)
-    }
+    useEffect(() => {
+        if (error) {
+            setPredictions([])
+            setEnabled(false)
+        }
+    }, [error])
 
 
     const { data: placeDetails } = useQuery(
@@ -176,10 +180,11 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         async () => GoogleApi.geoCodeApi(location)
     )
     useEffect(() => {
-        if (geoCodeResults) {
+        const geoPayload = getPayload(geoCodeResults)
+        const formattedAddress = geoPayload?.results?.[0]?.formatted_address
+        if (formattedAddress) {
             setCurrentLactionValue({
-                description:
-                    geoCodeResults?.data?.results[0]?.formatted_address,
+                description: formattedAddress,
             })
         } else {
             setCurrentLactionValue({
@@ -188,7 +193,7 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         }
     }, [geoCodeResults])
     useEffect(() => {
-        const zonePayload = zoneData?.data
+        const zonePayload = getPayload(zoneData)
         if (zonePayload?.zone_id) {
             setZoneId(zonePayload?.zone_id)
             dispatch(setZoneData(zonePayload?.zone_data || []))
@@ -207,12 +212,15 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         }
     }, [placeDetails])
     useEffect(() => {
-        if (places) {
-            const tempData = places?.data?.suggestions?.map((item) => ({
+        const placesPayload = getPayload(places)
+        if (placesPayload) {
+            const tempData = (placesPayload?.suggestions || []).map((item) => ({
                 place_id: item.placePrediction.placeId,
                 description: `${item?.placePrediction?.structuredFormat?.mainText?.text}, ${item?.placePrediction?.structuredFormat?.secondaryText?.text || ""}`
             }))
             setPredictions(tempData)
+        } else {
+            setPredictions([])
         }
     }, [places])
 
@@ -220,12 +228,13 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
         setLocation(values)
     }
     const handlePickLocationOnClick = () => {
+        const geoPayload = getPayload(geoCodeResults)
+        const formattedAddress = geoPayload?.results?.[0]?.formatted_address
         if (zoneId && geoCodeResults && location) {
             localStorage.setItem('zoneid', zoneId)
-            localStorage.setItem(
-                'location',
-                geoCodeResults?.data?.results[0]?.formatted_address
-            )
+            if (formattedAddress) {
+                localStorage.setItem('location', formattedAddress)
+            }
             localStorage.setItem('currentLatLng', JSON.stringify(location))
             dispatch(setUserLocationUpdate(!userLocationUpdate))
             CustomToaster('success', 'New location has been set.')

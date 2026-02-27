@@ -36,7 +36,12 @@ export const GoogleApi = {
         )
     },
     getZoneId: (location) => {
-        console.log({ location });
+        if (
+            !Number.isFinite(Number(location?.lat)) ||
+            !Number.isFinite(Number(location?.lng))
+        ) {
+            return null
+        }
 
         return MainApi.get(
             `/api/v1/config/get-zone-id?lat=${location?.lat}&lng=${location?.lng}`
