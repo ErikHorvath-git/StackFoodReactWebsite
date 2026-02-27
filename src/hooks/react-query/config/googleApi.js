@@ -1,5 +1,27 @@
 import MainApi from '../../../api/MainApi'
 
+const toFiniteNumber = (value) => {
+    const num = Number(value)
+    return Number.isFinite(num) ? num : null
+}
+
+export const getNormalizedLatLng = (response) => {
+    const location =
+        response?.data?.location ||
+        response?.data?.result?.geometry?.location ||
+        response?.result?.geometry?.location ||
+        response?.location
+
+    const lat = toFiniteNumber(location?.lat ?? location?.latitude)
+    const lng = toFiniteNumber(location?.lng ?? location?.longitude)
+
+    if (lat === null || lng === null) {
+        return null
+    }
+
+    return { lat, lng }
+}
+
 export const GoogleApi = {
     placeApiAutocomplete: (search) => {
         if (search && search !== '') {

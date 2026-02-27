@@ -8,12 +8,15 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { CustomStackFullWidth } from '../../../styled-components/CustomStyles.style'
-import Skeleton from '@mui/material/Skeleton'
 import MapMarker from './MapMarker'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { IconWrapper, grayscaleMapStyles } from './Map.style'
 import GpsFixedIcon from '@mui/icons-material/GpsFixed'
+
+const isValidLatLng = (value) =>
+    Number.isFinite(Number(value?.lat)) && Number.isFinite(Number(value?.lng))
+
 const GoogleMapComponent = ({
     setDisablePickButton,
     setLocationEnabled,
@@ -42,13 +45,13 @@ const GoogleMapComponent = ({
     }
 
     const mapRef = useRef(GoogleMap)
-    const center = useMemo(
-        () => ({
-            lat: parseFloat(location?.lat),
-            lng: parseFloat(location?.lng),
-        }),
-        [location]
-    )
+    const center = useMemo(() => {
+        if (!isValidLatLng(location)) return null
+        return {
+            lat: Number(location?.lat),
+            lng: Number(location?.lng),
+        }
+    }, [location])
 
 
     const { isLoaded } = useJsApiLoader({
@@ -77,15 +80,20 @@ const GoogleMapComponent = ({
     const [centerPosition, setCenterPosition] = useState(null)
 
     useEffect(() => {
-        setCenterPosition(center)
+        if (center) {
+            setCenterPosition(center)
+        }
     }, [center])
     const onLoad = useCallback(function callback(map) {
         setZoom(19)
         setMap(map)
     }, [])
     useEffect(() => {
-        if (location && placeDetailsEnabled) {
-            setCenterPosition(location)
+        if (isValidLatLng(location) && placeDetailsEnabled) {
+            setCenterPosition({
+                lat: Number(location?.lat),
+                lng: Number(location?.lng),
+            })
         }
         if (map?.center && mapSetup) {
             setCenterPosition({
@@ -162,7 +170,19 @@ const GoogleMapComponent = ({
         handleAgreeLocation?.()
     }
 
-    return isLoaded ? (
+    if (!isLoaded || !centerPosition) {
+        return (
+            <CustomStackFullWidth
+                justifyContent="center"
+                alignItems="center"
+                sx={{ minHeight: height ? height : isSmall ? '350px' : '400px' }}
+            >
+                <CircularProgress size={25} />
+            </CustomStackFullWidth>
+        )
+    }
+
+    return (
         <CustomStackFullWidth position="relative" className="map">
             <Stack
                 position="absolute"
@@ -301,24 +321,6 @@ const GoogleMapComponent = ({
                     </Stack>
                 )}
             </GoogleMap>
-        </CustomStackFullWidth>
-    ) : (
-        <CustomStackFullWidth
-            alignItems="center"
-            justifyContent="center"
-            sx={{
-                minHeight: '400px',
-                [theme.breakpoints.down('sm')]: {
-                    minHeight: '250px',
-                },
-            }}
-        >
-            <Skeleton
-                width="100%"
-                height="100%"
-                variant="rectangular"
-                animation="wave"
-            />
         </CustomStackFullWidth>
     )
 }

@@ -18,7 +18,7 @@ import GpsFixedIcon from '@mui/icons-material/GpsFixed'
 import CloseIcon from '@mui/icons-material/Close'
 import GoogleMapComponent from './GoogleMapComponent'
 import { useQuery } from 'react-query'
-import { GoogleApi } from '@/hooks/react-query/config/googleApi'
+import { GoogleApi, getNormalizedLatLng } from '@/hooks/react-query/config/googleApi'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'react-i18next'
@@ -200,10 +200,9 @@ const MapModal = ({ open, handleClose, redirectUrl, }) => {
 
     useEffect(() => {
         if (placeDetails) {
-            setLocation({
-                lat: placeDetails?.data?.location?.latitude,
-                lng: placeDetails?.data?.location?.longitude
-            })
+            const normalizedLocation = getNormalizedLatLng(placeDetails)
+            if (!normalizedLocation) return
+            setLocation(normalizedLocation)
             setLocationEnabled(true)
         }
     }, [placeDetails])

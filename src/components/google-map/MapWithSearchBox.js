@@ -9,6 +9,9 @@ import { useGetLocation } from '@/utils/custom-hook/useGetLocation'
 import useGetCheckZone from '@/hooks/react-query/zone-list/useGetCheckZone'
 import toast from 'react-hot-toast'
 
+const isValidLatLng = (value) =>
+    Number.isFinite(Number(value?.lat)) && Number.isFinite(Number(value?.lng))
+
 const MapWithSearch = ({
     orderType,
     searchBoxInside = false,
@@ -102,7 +105,7 @@ const MapWithSearch = ({
                     )}
                 </>
             )}
-            {!!location && orderType !== 'take_away' && (
+            {isValidLatLng(location) && orderType !== 'take_away' && (
                 <Box sx={{ position: 'relative' }}>
                     {searchBoxInside && (
                         <Box

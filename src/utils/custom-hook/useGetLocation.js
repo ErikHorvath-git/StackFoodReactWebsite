@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
-import { GoogleApi } from '@/hooks/react-query/config/googleApi'
+import { GoogleApi, getNormalizedLatLng } from '@/hooks/react-query/config/googleApi'
 import {
     setFormattedAddress,
     setLocation,
@@ -68,11 +68,10 @@ export const useGetLocation = (coords) => {
 
     useEffect(() => {
         if (placeDetails) {
+            const normalizedLocation = getNormalizedLatLng(placeDetails)
+            if (!normalizedLocation) return
             dispatch(
-                setLocation({
-                    lat: placeDetails?.data?.location?.latitude,
-                    lng: placeDetails?.data?.location?.longitude
-                })
+                setLocation(normalizedLocation)
             )
             setLocationEnabled(true)
         }
