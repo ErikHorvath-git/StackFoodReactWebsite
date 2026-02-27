@@ -33,6 +33,18 @@ const containerStyle = {
     height: '250px',
 }
 
+const toFiniteNumber = (value) => {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
+const normalizeLatLng = (value) => {
+    const lat = toFiniteNumber(value?.lat)
+    const lng = toFiniteNumber(value?.lng)
+    if (lat === null || lng === null) return null
+    return { lat, lng }
+}
+
 const MapComponentFindNear = ({
     latitude,
     longitude,
@@ -49,11 +61,10 @@ const MapComponentFindNear = ({
     const theme = useTheme()
     const { location } = useSelector((state) => state.addressData)
     const isXSmall = useMediaQuery(theme.breakpoints.down('sm'))
-    // const [hoveredMarkerId, setHoveredMarkerId] = useState("")
-    const [userLocation, setUserLocation] = useState({
-        lat: location?.lat,
-        lng: location?.lng,
-    })
+    const initialLocation =
+        normalizeLatLng({ lat: latitude, lng: longitude }) ||
+        normalizeLatLng(location)
+    const [userLocation, setUserLocation] = useState(initialLocation)
     const {
         searchKey,
         setSearchKey,
@@ -76,15 +87,24 @@ const MapComponentFindNear = ({
     })
     const handleAgreeLocation = () => {
         if (coords) {
-            setUserLocation({ lat: coords?.latitude, lng: coords?.longitude })
+            const gpsLocation = normalizeLatLng({
+                lat: coords?.latitude,
+                lng: coords?.longitude,
+            })
+            if (gpsLocation) {
+                setUserLocation(gpsLocation)
+                dispatch(setLocation(gpsLocation))
+            }
         }
     }
 
-
-    const center = {
-        lat: parseFloat(userLocation?.lat),
-        lng: parseFloat(userLocation?.lng),
-    }
+    const center = useMemo(
+        () =>
+            normalizeLatLng(userLocation) ||
+            normalizeLatLng({ lat: latitude, lng: longitude }) ||
+            normalizeLatLng(location),
+        [userLocation, latitude, longitude, location]
+    )
     const options = useMemo(
         () => ({
             zoomControl: false,
@@ -120,21 +140,19 @@ const MapComponentFindNear = ({
         }
     }
 
-    const handleSearchLocation = (lat, lng) => {
-        setUserLocation({ lat, lng })
-    }
     useEffect(() => {
-        setUserLocation({ lat: location?.lat, lng: location?.lng })
+        const normalizedLocation = normalizeLatLng(location)
+        if (normalizedLocation) {
+            setUserLocation(normalizedLocation)
+        }
     }, [location])
 
     useEffect(() => {
-        dispatch(
-            setLocation({
-                lat: latitude,
-                lng: longitude,
-            })
-        )
-    }, [])
+        const normalizedLocation = normalizeLatLng({ lat: latitude, lng: longitude })
+        if (normalizedLocation) {
+            dispatch(setLocation(normalizedLocation))
+        }
+    }, [dispatch, latitude, longitude])
 
     const clickOnResIcon = (id) => {
         setHoveredMarkerId(`restaurent-${id}`)
@@ -146,7 +164,7 @@ const MapComponentFindNear = ({
         setOpenUserMsg(!openUserMsg)
         setHoveredMarkerId(null)
     }
-    return isLoaded ? (
+    return isLoaded && center ? (
         <CustomStackFullWidth position="relative" className="map">
             <Stack
                 position="absolute"
@@ -222,10 +240,7 @@ const MapComponentFindNear = ({
             >
                 <Marker
                     key={`user`}
-                    position={{
-                        lat: parseFloat(userLocation?.lat),
-                        lng: parseFloat(userLocation?.lng),
-                    }}
+                    position={center}
                     icon={{
                         url: 'static/location-pins/customer_location_icon.svg',
                         scaledSize: new window.google.maps.Size(55, 55),
@@ -234,10 +249,7 @@ const MapComponentFindNear = ({
                 >
                     {openUserMsg && (
                         <InfoWindow
-                            position={{
-                                lat: parseFloat(userLocation?.lat),
-                                lng: parseFloat(userLocation?.lng),
-                            }}
+                            position={center}
                             pixelOffset={new window.google.maps.Size(0, -30)}
                         >
                             <Box

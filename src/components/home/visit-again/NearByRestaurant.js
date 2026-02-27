@@ -10,6 +10,19 @@ import MapComponentFindNear from './MapComponentFindNear'
 import { RTL } from '@/components/RTL/RTL'
 import { RestaurantsApi } from '@/hooks/react-query/config/restaurantApi'
 import { handleRestaurantRedirect } from '@/utils/customFunctions'
+import { useSelector } from 'react-redux'
+
+const toFiniteNumber = (value) => {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+}
+
+const normalizeLatLng = (value) => {
+    const lat = toFiniteNumber(value?.lat)
+    const lng = toFiniteNumber(value?.lng)
+    if (lat === null || lng === null) return null
+    return { lat, lng }
+}
 
 const NearByRestaurant = ({ dineIn }) => {
     const theme = useTheme()
@@ -26,12 +39,18 @@ const NearByRestaurant = ({ dineIn }) => {
     const [restaurants, setRestaurants] = useState(null)
     const [allRestaurants, setAllrestaurants] = useState(null)
     const [hoveredMarkerId, setHoveredMarkerId] = useState(null)
+    const { location: selectedLocation } = useSelector((state) => state.addressData)
+    const { global } = useSelector((state) => state.globalSettings)
     if (typeof window !== 'undefined') {
         languageDirection = localStorage.getItem('direction')
     }
     if (typeof window !== 'undefined') {
         currentLocation = JSON.parse(localStorage.getItem('currentLatLng'))
     }
+    const mapLocation =
+        normalizeLatLng(currentLocation) ||
+        normalizeLatLng(selectedLocation) ||
+        normalizeLatLng(global?.default_location)
     const { refetch, isRefetching } = useQuery(
         ['all-restaurants', offset, page_limit],
         () =>
@@ -100,8 +119,8 @@ const NearByRestaurant = ({ dineIn }) => {
                     <Stack borderRadius="8px">
                         <MapComponentFindNear
                             handleRouteToRestaurant={handleRouteToRestaurant}
-                            latitude={currentLocation?.lat}
-                            longitude={currentLocation?.lng}
+                            latitude={mapLocation?.lat}
+                            longitude={mapLocation?.lng}
                             data={restaurants}
                             customMapStyle={customMapStyle}
                             hoveredMarkerId={hoveredMarkerId}
